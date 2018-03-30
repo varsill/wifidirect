@@ -16,5 +16,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Discover Peers" />
+
+        <ListView
+            android:id="@+id/listview"
+            android:layout_width="match_parent"
+            android:layout_height="466dp" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
