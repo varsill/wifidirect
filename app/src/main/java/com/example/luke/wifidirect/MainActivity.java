@@ -1,10 +1,13 @@
 package com.example.luke.wifidirect;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
     WifiP2pManager mWifiP2pManager;
@@ -24,7 +27,25 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         filter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         filter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        Button button = findViewById(R.id.button2);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View view)
+            {
+                mWifiP2pManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() {
 
+                    }
+
+                    @Override
+                    public void onFailure(int i) {
+
+                    }
+                });
+            }
+
+        });
     }
     @Override
     protected void onResume()
