@@ -1,23 +1,36 @@
 package com.example.luke.wifidirect;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
+import android.net.Uri;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
     WifiP2pManager mWifiP2pManager;
     WifiP2pManager.Channel mChannel;
     Receiver mReceiver;
     IntentFilter filter;
+    final int PORT = 8888;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         filter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         filter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        Button button = findViewById(R.id.button2);
-        ListView listView = findViewById(R.id.listview);
+        final Button button = findViewById(R.id.button2);
+        final ListView listView = findViewById(R.id.listview);
 
         button.setOnClickListener(new View.OnClickListener()
         {
@@ -47,15 +60,60 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(int i) {
-
+                        Toast.makeText(getApplicationContext(), "Dupa, nie dziala", Toast.LENGTH_LONG).show();
                     }
                 });
             }
         });
-        listView.setOnClickListener(new View.OnClickListener() {
+
+      //  listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+        listView.setFocusable(false);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
-                
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                button.setText("jam jest");
+                try{
+                  final String address = (String) listView.getItemAtPosition(i);
+                    button.setText(address);
+                     WifiP2pDevice device =   mReceiver.devicelist.get(address);
+                    WifiP2pConfig config = new WifiP2pConfig();
+                    config.deviceAddress=address;
+                    mWifiP2pManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+                        @Override
+                        public void onSuccess() {
+
+                            Log.d("Blad", "Polaczono z adresem "+address);
+                        Socket socket =  new Socket();
+                        byte buf[]=new byte[1024];
+                        try
+                        {
+                            socket.bind(null);//bo to client
+                            socket.connect( new InetSocketAddress(address, PORT));
+                            OutputStream outputStream = socket.getOutputStream();
+                            InputStream inputStream = socket.getInputStream();
+                            boolean istoread = false;
+                            while(istoread=inputStream.read(buf)!= -1)
+                            {
+                                outputStream.write(buf, 0, buf.length);
+                            }
+
+                        }catch (Exception e)
+                        {
+                            Log.e("Blad", "Problem z przesylaniem plikow");
+                        }
+                        }
+
+                        @Override
+                        public void onFailure(int i) {
+                            Log.e("Blad", "Nie mozna polaczyc");
+                        }
+                    });
+                } catch(Exception e)
+                {
+                    Log.e("Blad", "Nie mozna pobrac nazwy");
+                }
+
             }
         });
     }
