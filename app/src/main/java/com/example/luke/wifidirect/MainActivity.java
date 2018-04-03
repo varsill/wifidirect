@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     WifiP2pManager mWifiP2pManager;
@@ -54,8 +55,7 @@ public class MainActivity extends AppCompatActivity {
                 mWifiP2pManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
                     @Override
                     public void onSuccess() {
-
-
+                        listView.setAdapter(new PeerAdapter(getApplicationContext(),new ArrayList<Peer>()));
                     }
 
                     @Override
@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
                         {
                             socket.bind(null);//bo to client
                             socket.connect( new InetSocketAddress(dev.address, PORT));
+
                             OutputStream outputStream = socket.getOutputStream();
                             InputStream inputStream = socket.getInputStream();
                             boolean istoread = false;
@@ -100,13 +101,13 @@ public class MainActivity extends AppCompatActivity {
 
                         }catch (Exception e)
                         {
-                            Log.e("Blad", "Problem z przesylaniem plikow");
+                            Log.e("Błąd", "Problem z przesyłaniem plików");
                         }
                         }
 
                         @Override
                         public void onFailure(int i) {
-                            Log.e("Blad", "Nie mozna polaczyc");
+                            Log.e("Błąd", "Nie można połączyć");
                         }
                     });
                 } catch(Exception e)
