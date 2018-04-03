@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         final Button button = findViewById(R.id.button2);
         final ListView listView = findViewById(R.id.listview);
-
+        button.setText("Znajdź urządzenia w pobliżu");
         button.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View view)
@@ -72,24 +72,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                button.setText("jam jest");
+                button.setText("Trwa  łączenie");
                 try{
-                  final String address = (String) listView.getItemAtPosition(i);
-                    button.setText(address);
-                     WifiP2pDevice device =   mReceiver.devicelist.get(address);
+                  final Peer dev = (Peer) listView.getItemAtPosition(i);
+
+                     WifiP2pDevice device =   mReceiver.devicelist.get(dev.address);
                     WifiP2pConfig config = new WifiP2pConfig();
-                    config.deviceAddress=address;
+                    config.deviceAddress=dev.address;
                     mWifiP2pManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {
 
-                            Log.d("Blad", "Polaczono z adresem "+address);
+                            Log.d("Dziala", "Polaczono z adresem "+dev.address);
                         Socket socket =  new Socket();
                         byte buf[]=new byte[1024];
                         try
                         {
                             socket.bind(null);//bo to client
-                            socket.connect( new InetSocketAddress(address, PORT));
+                            socket.connect( new InetSocketAddress(dev.address, PORT));
                             OutputStream outputStream = socket.getOutputStream();
                             InputStream inputStream = socket.getInputStream();
                             boolean istoread = false;

@@ -5,15 +5,17 @@
     android:id="@+id/row">
 
 
-        <TextView android:textColor="#FFFFFF"
+        <TextView
             android:id="@+id/textview"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="id" android:textStyle="bold"
-            android:gravity="left"
             android:layout_weight="1"
-            android:typeface="monospace"
-            android:height="40sp" />
+            android:height="40sp"
+            android:gravity="left"
+            android:text="id"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:typeface="monospace" />
 
 
 

@@ -84,7 +84,7 @@ public class Receiver extends BroadcastReceiver {
 
     }
     @Override
-    public void onReceive(Context con, Intent intent) {
+    public void onReceive(final Context con, Intent intent) {
         String action = intent.getAction();
         final Context context = con;
         peerNameList=new ArrayList<Peer>();
@@ -115,7 +115,7 @@ public class Receiver extends BroadcastReceiver {
                           }
                           devicelist=wifiP2pDeviceList;
                             ListView listView = (ListView)((Activity)context).findViewById(R.id.listview);
-                            ArrayAdapter<Peer> adapter = new ArrayAdapter<Peer>(context, R.layout.row, peerNameList);
+                            PeerAdapter adapter = new PeerAdapter(context, peerNameList);
                             listView.setAdapter(adapter);
                             adapter.notifyDataSetChanged();
                         }
