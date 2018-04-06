@@ -97,12 +97,25 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
     public boolean makeToast(String text, int length)
     {
         if(length ==1 ) {
-            Toast.makeText(this, text, Toast.LENGTH_LONG);
+            try{
+                Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+            }catch(Exception e)
+            {
+                Log.e("Problem with Toast", e.getMessage());
+                return false;
+            }
+
             return true;
         }
         if (length==0)
         {
-            Toast.makeText(this, text, Toast.LENGTH_SHORT);
+            try{
+                Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+            }catch(Exception e)
+            {
+                Log.e("Problem with Toast", e.getMessage());
+                return false;
+            }
             return true;
         }
         return false; //wrong length
@@ -123,17 +136,7 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
         {
             public void onClick(View view)
             {
-               ConnectionManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
-                    @Override
-                    public void onSuccess() {
-                      //  listView.setAdapter(new PeerAdapter(getApplicationContext(),new ArrayList<Peer>()));
-                    }
 
-                    @Override
-                    public void onFailure(int i) {
-                        Toast.makeText(getApplicationContext(), "Dupa, nie dziala", Toast.LENGTH_LONG).show();
-                    }
-                });
             }
         });
 
