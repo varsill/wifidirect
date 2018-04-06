@@ -185,6 +185,10 @@ public class ConnectionManager {
             });
         }
     }
+    private void setSocketConnection(String address, int port)
+    {
+
+    }
 
 
     public void connectWithDevice(final Peer peer)
