@@ -32,10 +32,11 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class MainActivity extends AppCompatActivity implements ActivityContextInterface
 {
-   // final int PORT = 8888;
+
+    final ConnectionManager connectionManager = new ConnectionManager(this);
+
     @Override
      public boolean setText(String text, int id)
     {
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final ConnectionManager connectionManager = new ConnectionManager(this);
+
         setContentView(R.layout.activity_main);
         final Button button = findViewById(R.id.button2);
         final ListView listView = findViewById(R.id.listview);
@@ -149,45 +150,12 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
                 button.setText("Trwa  łączenie");
                 try{
                   final Peer peer = (Peer) listView.getItemAtPosition(i);
-                    connectionManager.connectWithDevice(peer);
-                    WifiP2pDevice device =   mReceiver.devicelist.get(dev.address);
-                    WifiP2pConfig config = new WifiP2pConfig();
-                    config.deviceAddress=dev.address;
-                    mWifiP2pManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
-                        @Override
-                        public void onSuccess() {
+                  connectionManager.connectWithDevice(peer);
 
-                            Log.d("Dziala", "Polaczono z adresem "+dev.address);
-                        Socket socket =  new Socket();
-                        byte buf[]=new byte[1024];
-                        try
-                        {
 
-                            socket.bind(null);//bo to client
-                            socket.connect( new InetSocketAddress(dev.address, PORT));
-
-                            OutputStream outputStream = socket.getOutputStream();
-                            InputStream inputStream = socket.getInputStream();
-                            boolean istoread = false;
-                            while(istoread=inputStream.read(buf)!= -1)
-                            {
-                                outputStream.write(buf, 0, buf.length);
-                            }
-
-                        }catch (Exception e)
-                        {
-                            Log.e("Błąd", "Problem z przesyłaniem plików");
-                        }
-                        }
-
-                        @Override
-                        public void onFailure(int i) {
-                            Log.e("Błąd", "Nie można połączyć");
-                        }
-                    });
                 } catch(Exception e)
                 {
-                    Log.e("Blad", "Nie mozna pobrac nazwy");
+                    Log.e("ListView", e.getMessage());
                 }
 
             }

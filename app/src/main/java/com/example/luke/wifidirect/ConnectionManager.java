@@ -3,6 +3,7 @@ package com.example.luke.wifidirect;
 import android.app.Activity;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -17,6 +18,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -87,6 +92,7 @@ public class ConnectionManager {
     private boolean success;
     private boolean isready=false;
     private WifiP2pDeviceList devicelist;
+    static final int PORT =  9999;
     public ConnectionManager(Activity activity) {
         this.context = (Context)activity;
         activityContextInterface=(ActivityContextInterface) activity;
@@ -181,8 +187,49 @@ public class ConnectionManager {
     }
 
 
-    public void connectWithDevice(Peer peer)
+    public void connectWithDevice(final Peer peer)
     {
         final WifiP2pDevice device =  devicelist.get(peer.address);
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress=peer.address;
+        try
+        {
+
+        mWifiP2pManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+                Log.d("WifiP2pManager", "Connected with address "+peer.address);
+                Socket socket =  new Socket();
+                byte buf[]=new byte[1024];
+                try
+                {
+
+                    socket.bind(null);//bo to client
+                    socket.connect( new InetSocketAddress(peer.address, PORT));
+
+                    OutputStream outputStream = socket.getOutputStream();
+                    InputStream inputStream = socket.getInputStream();
+                    boolean istoread = false;
+                    while(istoread=inputStream.read(buf)!= -1)
+                    {
+                        outputStream.write(buf, 0, buf.length);
+                    }
+
+                }catch (Exception e)
+                {
+                    Log.e("Socket", "Problem with socket binding");
+                }
+            }
+
+            @Override
+            public void onFailure(int i) {
+                Log.e("WifiP2pManager", "Problem  with connectiion");
+            }
+        });
+        }catch(Exception e)
+        {
+            Log.e("WifiP2pManager", e.getMessage());
+        }
     }
 }
