@@ -15,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -74,7 +75,7 @@ public class Receiver extends BroadcastReceiver {
     boolean isReady;
     public WifiP2pDeviceList devicelist;
     public  ArrayList<Peer> peerNameList;
-
+    private Collection<WifiP2pDevice> oldcollection;
     Receiver(WifiP2pManager m, WifiP2pManager.Channel c)
     {
         this.mWifiP2pManager=m;
@@ -104,16 +105,25 @@ public class Receiver extends BroadcastReceiver {
                 if(mWifiP2pManager!=null)
                 {
 
-                    Button button =  (Button)((Activity)context).findViewById(R.id.button2);
-                    button.setText("Dostępne urządzenia:");
+                   final Button button =  (Button)((Activity)context).findViewById(R.id.button2);
+
                     mWifiP2pManager.requestPeers(mChannel, new WifiP2pManager.PeerListListener() {
                         @Override
                         public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
+                            if(wifiP2pDeviceList.getDeviceList().size()==0)
+                            {
+                                button.setText("Brak dostepnych urządzeń. Skanuj jeszcze raz:");
+                            }
+                            if(wifiP2pDeviceList.getDeviceList()==oldcollection)
+                            {
+                                return ;
+                            }
+                           oldcollection= wifiP2pDeviceList.getDeviceList();
                           for(WifiP2pDevice device: wifiP2pDeviceList.getDeviceList())
                           {
                               peerNameList.add(new Peer(device.deviceName, device.deviceAddress));
                           }
-                          devicelist=wifiP2pDeviceList;
+                            devicelist=wifiP2pDeviceList;
                             ListView listView = (ListView)((Activity)context).findViewById(R.id.listview);
                             PeerAdapter adapter = new PeerAdapter(context, peerNameList);
                             listView.setAdapter(adapter);
@@ -122,7 +132,7 @@ public class Receiver extends BroadcastReceiver {
                     });
                 }
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
-
+            Toast.makeText(context, "Połączono", Toast.LENGTH_LONG);
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
 
         }

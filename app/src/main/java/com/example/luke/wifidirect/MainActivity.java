@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
                 mWifiP2pManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
                     @Override
                     public void onSuccess() {
-                        listView.setAdapter(new PeerAdapter(getApplicationContext(),new ArrayList<Peer>()));
+                      //  listView.setAdapter(new PeerAdapter(getApplicationContext(),new ArrayList<Peer>()));
                     }
 
                     @Override
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 try{
                   final Peer dev = (Peer) listView.getItemAtPosition(i);
 
-                     WifiP2pDevice device =   mReceiver.devicelist.get(dev.address);
+                    WifiP2pDevice device =   mReceiver.devicelist.get(dev.address);
                     WifiP2pConfig config = new WifiP2pConfig();
                     config.deviceAddress=dev.address;
                     mWifiP2pManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
                         byte buf[]=new byte[1024];
                         try
                         {
+
                             socket.bind(null);//bo to client
                             socket.connect( new InetSocketAddress(dev.address, PORT));
 
