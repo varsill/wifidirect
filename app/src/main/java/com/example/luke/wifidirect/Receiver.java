@@ -27,7 +27,6 @@ import java.util.List;
 public class Receiver extends BroadcastReceiver {
 
     private ConnectionManager connectionManager;
-    private Collection<WifiP2pDevice> oldcollection;
     Receiver(ConnectionManager  connectionManager)
     {
         this.connectionManager = connectionManager;

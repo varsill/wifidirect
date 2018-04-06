@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 class Peer {
     String name;
@@ -84,9 +86,11 @@ public class ConnectionManager {
     private IntentFilter filter;
     private boolean success;
     private boolean isready=false;
+    private WifiP2pDeviceList devicelist;
     public ConnectionManager(Activity activity) {
         this.context = (Context)activity;
         activityContextInterface=(ActivityContextInterface) activity;
+        devicelist = new WifiP2pDeviceList();
         mWifiP2pManager = (WifiP2pManager) context.getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mWifiP2pManager.initialize(context, context.getMainLooper(), null);
         mReceiver = new Receiver(this);
@@ -123,6 +127,11 @@ public class ConnectionManager {
     {
         context.unregisterReceiver(mReceiver);
     }
+    public void setDevicelist(WifiP2pDeviceList devicelist)
+    {
+        this.devicelist=devicelist;
+    }
+
     public boolean discoverPeers()
     {
 
@@ -143,38 +152,37 @@ public class ConnectionManager {
         });
         return getsuccess();
     }
-    public boolean peersChanged()
+    public void peersChanged()
     {
         if(mWifiP2pManager!=null)
         {
 
-            final Button button =  (Button)((Activity)context).findViewById(R.id.button2);
 
             mWifiP2pManager.requestPeers(mChannel, new WifiP2pManager.PeerListListener() {
                 @Override
                 public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
                     if(wifiP2pDeviceList.getDeviceList().size()==0)
                     {
-                        button.setText("Brak dostepnych urządzeń. Skanuj jeszcze raz:");
+                        activityContextInterface.setText("Brak dostepnych urządzeń. Skanuj jeszcze raz:", R.id.button2);
+                        Log.d("WifiP2pDeviceList", "No peers available");
                     }
-                    if(wifiP2pDeviceList.getDeviceList()==oldcollection)
-                    {
-                        return ;
-                    }
-                    oldcollection= wifiP2pDeviceList.getDeviceList();
+
+                    ArrayList<Peer> peerslist = new ArrayList<Peer>();
                     for(WifiP2pDevice device: wifiP2pDeviceList.getDeviceList())
                     {
-                        peerNameList.add(new Peer(device.deviceName, device.deviceAddress));
+                        peerslist.add(new Peer(device.deviceName, device.deviceAddress));
                     }
-                    devicelist=wifiP2pDeviceList;
-                    ListView listView = (ListView)((Activity)context).findViewById(R.id.listview);
-                    PeerAdapter adapter = new PeerAdapter(context, peerNameList);
-                    listView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
+
+                    activityContextInterface.reloadPeerListView(peerslist, R.id.listview);
+                    Log.d("ConnectionManager", "Added list of peers to be visualized by listview");
                 }
             });
         }
     }
 
 
+    public void connectWithDevice(Peer peer)
+    {
+        final WifiP2pDevice device =  devicelist.get(peer.address);
+    }
 }

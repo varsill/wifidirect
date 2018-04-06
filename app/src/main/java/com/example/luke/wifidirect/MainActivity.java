@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ConnectionManager connectionManager = new ConnectionManager(this);
+        final ConnectionManager connectionManager = new ConnectionManager(this);
         setContentView(R.layout.activity_main);
         final Button button = findViewById(R.id.button2);
         final ListView listView = findViewById(R.id.listview);
@@ -148,8 +148,8 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
 
                 button.setText("Trwa  łączenie");
                 try{
-                  final Peer dev = (Peer) listView.getItemAtPosition(i);
-
+                  final Peer peer = (Peer) listView.getItemAtPosition(i);
+                    connectionManager.connectWithDevice(peer);
                     WifiP2pDevice device =   mReceiver.devicelist.get(dev.address);
                     WifiP2pConfig config = new WifiP2pConfig();
                     config.deviceAddress=dev.address;
