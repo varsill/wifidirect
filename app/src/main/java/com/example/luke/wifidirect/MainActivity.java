@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.InputStream;
@@ -26,12 +27,22 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ActivityContextInterface
+{
     WifiP2pManager mWifiP2pManager;
     WifiP2pManager.Channel mChannel;
     Receiver mReceiver;
     IntentFilter filter;
     final int PORT = 8888;
+    @Override
+     public boolean SetText(String text, int id)
+    {
+       TextView textView = findViewById(id);
+       if(textView==null) return false;
+       textView.setText(text);
+       return true; 
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         final Button button = findViewById(R.id.button2);
         final ListView listView = findViewById(R.id.listview);
+
         button.setText("Znajdź urządzenia w pobliżu");
         button.setOnClickListener(new View.OnClickListener()
         {
