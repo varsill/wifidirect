@@ -35,11 +35,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ActivityContextInterface
 {
-    WifiP2pManager mWifiP2pManager;
-    WifiP2pManager.Channel mChannel;
-    Receiver mReceiver;
-    IntentFilter filter;
-    final int PORT = 8888;
+   // final int PORT = 8888;
     @Override
      public boolean setText(String text, int id)
     {
@@ -49,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
        return true;
     }
     @Override
+
     public boolean addItemToPeerListView(Peer item, int id)
     {
         ListView listView = findViewById(id);
@@ -66,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
         return true;
     }
     @Override
+
     public boolean addItemToPeerListView(ArrayList<Peer> listtobeadded, int id)
     {
         ListView listView = findViewById(id);
@@ -87,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
         return true;
     }
     @Override
+
     public boolean reloadPeerListView (ArrayList<Peer> listtobeadded, int id)
     {
         ListView listView = findViewById(id);
@@ -95,30 +94,36 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
         listView.setAdapter(adapter);
         return true;
     }
+    public boolean makeToast(String text, int length)
+    {
+        if(length ==1 ) {
+            Toast.makeText(this, text, Toast.LENGTH_LONG);
+            return true;
+        }
+        if (length==0)
+        {
+            Toast.makeText(this, text, Toast.LENGTH_SHORT);
+            return true;
+        }
+        return false; //wrong length
+    }
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ConnectionManager connectionManager = new ConnectionManager(this);
         setContentView(R.layout.activity_main);
-        mWifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mWifiP2pManager.initialize(this, getMainLooper(), null);
-        mReceiver = new Receiver(mWifiP2pManager, mChannel);
-
-        filter = new IntentFilter();
-        filter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        filter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        filter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        filter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         final Button button = findViewById(R.id.button2);
         final ListView listView = findViewById(R.id.listview);
-
         button.setText("Znajdź urządzenia w pobliżu");
+
         button.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View view)
             {
-                mWifiP2pManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+               ConnectionManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
                     @Override
                     public void onSuccess() {
                       //  listView.setAdapter(new PeerAdapter(getApplicationContext(),new ArrayList<Peer>()));
@@ -189,13 +194,14 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
     protected void onResume()
     {
         super.onResume();
-        registerReceiver(mReceiver, filter);
+        connectionManager.reasumed();
+
     }
     @Override
     protected void onPause()
     {
         super.onPause();
-        unregisterReceiver(mReceiver);
+        connectionManager.paused();
     }
 
 

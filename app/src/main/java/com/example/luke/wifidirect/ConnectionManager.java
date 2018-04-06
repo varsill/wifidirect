@@ -1,15 +1,16 @@
 package com.example.luke.wifidirect;
 
 import android.content.Context;
+import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
-
-
 
 class Peer {
     String name;
@@ -20,7 +21,6 @@ class Peer {
         address=a;
     }
 }
-
 
 class PeerAdapter extends BaseAdapter
 {
@@ -67,6 +67,36 @@ interface ActivityContextInterface
     public boolean  addItemToPeerListView  (Peer item, int id);
     public boolean addItemToPeerListView   (ArrayList <Peer> listtobeadded, int id);
     public boolean reloadPeerListView (ArrayList <Peer> listtobeadded, int id);
+    public boolean makeToast(String text, int length);
 }
 public class ConnectionManager {
+    private Context context;
+    private WifiP2pManager mWifiP2pManager;
+    private WifiP2pManager.Channel mChannel;
+    private Receiver mReceiver;
+    private IntentFilter filter;
+
+    public ConnectionManager(Context context) {
+        this.context = context;
+        mWifiP2pManager = (WifiP2pManager) context.getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mWifiP2pManager.initialize(context, context.getMainLooper(), null);
+        mReceiver = new Receiver(mWifiP2pManager, mChannel);
+        filter = new IntentFilter();
+        filter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        filter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        filter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        filter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+
+    }
+
+    public void paused()
+    {
+        context.registerReceiver(mReceiver, filter);
+    }
+    public void reasumed()
+    {
+        context.unregisterReceiver(mReceiver);
+    }
+    public void 
+
 }
