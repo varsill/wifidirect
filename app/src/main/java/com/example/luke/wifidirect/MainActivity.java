@@ -12,11 +12,15 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +30,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity implements ActivityContextInterface
 {
@@ -35,13 +41,61 @@ public class MainActivity extends AppCompatActivity implements ActivityContextIn
     IntentFilter filter;
     final int PORT = 8888;
     @Override
-     public boolean SetText(String text, int id)
+     public boolean setText(String text, int id)
     {
        TextView textView = findViewById(id);
        if(textView==null) return false;
        textView.setText(text);
-       return true; 
+       return true;
     }
+    @Override
+    public boolean addItemToPeerListView(Peer item, int id)
+    {
+        ListView listView = findViewById(id);
+        if(listView==null) return false;
+        ArrayList<Peer> list = new ArrayList<Peer>();
+        for(int i=0; i<listView.getAdapter().getCount(); i++)
+        {
+            list.add((Peer)listView.getItemAtPosition(i));
+        }
+        list.add(item);
+        PeerAdapter adapter = new PeerAdapter(this, list);
+        listView.setAdapter(adapter);
+
+
+        return true;
+    }
+    @Override
+    public boolean addItemToPeerListView(ArrayList<Peer> listtobeadded, int id)
+    {
+        ListView listView = findViewById(id);
+        if(listView==null) return false;
+        ArrayList<Peer> list = new ArrayList<Peer>();
+        ListAdapter oldadapter = listView.getAdapter();
+        if(oldadapter!=null) {
+            for (int i = 0; i <oldadapter.getCount(); i++) {
+                list.add((Peer) listView.getItemAtPosition(i));
+            }
+        }
+        for(int i=0; i<listtobeadded.size(); i++)
+        {
+            list.add(listtobeadded.get(i));
+        }
+
+        PeerAdapter adapter = new PeerAdapter(this, list);
+        listView.setAdapter(adapter);
+        return true;
+    }
+    @Override
+    public boolean reloadPeerListView (ArrayList<Peer> listtobeadded, int id)
+    {
+        ListView listView = findViewById(id);
+        if(listView==null) return false;
+        PeerAdapter adapter = new PeerAdapter(this, listtobeadded);
+        listView.setAdapter(adapter);
+        return true;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
